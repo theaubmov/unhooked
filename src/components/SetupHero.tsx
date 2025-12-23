@@ -35,11 +35,7 @@ export function SetupHero({
         <span className="status-pill">{activePlatform.status}</span>
       </div>
       <h1>Unhook from the scroll.</h1>
-      <p>
-        A focused clean-up tool for people who want their feeds to feel
-        intentional again. We start with YouTube and are building toward X and
-        LinkedIn next.
-      </p>
+      <p>{activePlatform.summary}</p>
       <div className="hero-row">
         <PlatformSwitcher
           platforms={platforms}

@@ -20,6 +20,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [totalSubscriptions, setTotalSubscriptions] = useState<number | null>(null);
   const activePlatform =
     PLATFORMS.find((platform) => platform.id === activeId) ?? PLATFORMS[0];
   const themeStyle: CSSVars = {
@@ -128,7 +130,14 @@ export default function App() {
       setSubscriptions((prev) =>
         pageToken ? [...prev, ...hydratedItems] : hydratedItems,
       );
+      if (!pageToken) {
+        const totalResults = response.pageInfo?.totalResults;
+        if (typeof totalResults === 'number') {
+          setTotalSubscriptions(totalResults);
+        }
+      }
       setNextPageToken(response.nextPageToken);
+      setHasLoaded(true);
       if (!pageToken) {
         setCurrentIndex(0);
       }
@@ -181,6 +190,8 @@ export default function App() {
     setCurrentIndex(0);
     setNextPageToken(undefined);
     setErrorMessage(null);
+    setHasLoaded(false);
+    setTotalSubscriptions(null);
   };
 
   return (
@@ -200,12 +211,14 @@ export default function App() {
         <SwipeView
           currentIndex={currentIndex}
           totalCount={subscriptions.length}
+          totalAvailable={totalSubscriptions ?? undefined}
           currentCard={currentCard}
           nextCard={nextCard}
           isLoading={isLoading}
           isActionLoading={isActionLoading}
           errorMessage={errorMessage}
           canLoadMore={!!nextPageToken && !isLoading}
+          hasLoaded={hasLoaded}
           onBack={handleReset}
           onLoadMore={() => void loadSubscriptions(nextPageToken)}
           onUnsubscribe={() => void handleSwipe('left')}

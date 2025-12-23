@@ -13,6 +13,8 @@ type SwipeViewProps = {
   isActionLoading: boolean;
   errorMessage: string | null;
   canLoadMore: boolean;
+  totalAvailable?: number;
+  hasLoaded: boolean;
   onBack: () => void;
   onLoadMore: () => void;
   onUnsubscribe: () => void;
@@ -30,6 +32,8 @@ export function SwipeView({
   isActionLoading,
   errorMessage,
   canLoadMore,
+  totalAvailable,
+  hasLoaded,
   onBack,
   onLoadMore,
   onUnsubscribe,
@@ -42,10 +46,12 @@ export function SwipeView({
       <SwipeHeader
         currentIndex={currentIndex}
         totalCount={totalCount}
+        totalAvailable={totalAvailable}
+        isLoading={isLoading}
+        hasCurrentCard={!!currentCard}
         onBack={onBack}
       />
 
-      {isLoading && <div className="loader">Loading your channels...</div>}
       {errorMessage && <div className="error">{errorMessage}</div>}
 
       {!isLoading && currentCard ? (
@@ -65,7 +71,7 @@ export function SwipeView({
         </>
       ) : null}
 
-      {!isLoading && !currentCard && (
+      {!isLoading && !currentCard && hasLoaded && (
         <SwipeEmptyState
           canLoadMore={canLoadMore}
           onLoadMore={onLoadMore}

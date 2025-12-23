@@ -35,7 +35,7 @@ export function SetupView({
         onPlatformChange={onPlatformChange}
         onStart={onStart}
       />
-      <SetupCards summary={activePlatform.summary} />
+      <SetupCards />
     </>
   );
 }
