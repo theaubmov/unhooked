@@ -1,5 +1,4 @@
 import type { Platform, PlatformId } from '../app.types';
-import { SetupCards } from './SetupCards';
 import { SetupHero } from './SetupHero';
 
 type SetupViewProps = {
@@ -11,6 +10,7 @@ type SetupViewProps = {
   errorMessage: string | null;
   onPlatformChange: (platformId: PlatformId) => void;
   onStart: () => Promise<void>;
+  onOpenRoadmap: () => void;
 };
 
 export function SetupView({
@@ -22,6 +22,7 @@ export function SetupView({
   errorMessage,
   onPlatformChange,
   onStart,
+  onOpenRoadmap,
 }: SetupViewProps) {
   return (
     <>
@@ -34,8 +35,8 @@ export function SetupView({
         errorMessage={errorMessage}
         onPlatformChange={onPlatformChange}
         onStart={onStart}
+        onOpenRoadmap={onOpenRoadmap}
       />
-      <SetupCards />
     </>
   );
 }

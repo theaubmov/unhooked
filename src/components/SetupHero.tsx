@@ -11,6 +11,7 @@ type SetupHeroProps = {
   errorMessage: string | null;
   onPlatformChange: (platformId: PlatformId) => void;
   onStart: () => Promise<void>;
+  onOpenRoadmap: () => void;
 };
 
 export function SetupHero({
@@ -22,17 +23,23 @@ export function SetupHero({
   errorMessage,
   onPlatformChange,
   onStart,
+  onOpenRoadmap,
 }: SetupHeroProps) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     void onStart();
   };
-
   return (
     <header className="hero">
       <div className="hero-top">
         <span className="brand">Unhooked</span>
-        <span className="status-pill">{activePlatform.status}</span>
+        <button
+          className="status-pill status-pill-button"
+          type="button"
+          onClick={onOpenRoadmap}
+        >
+          {activePlatform.status}
+        </button>
       </div>
       <h1>Unhook from the scroll.</h1>
       <p>{activePlatform.summary}</p>

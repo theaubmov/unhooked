@@ -40,6 +40,8 @@ Follow existing conventions:
 - Keep `src/App.tsx` focused on orchestration (state, handlers, data flow); move UI sections into `src/components/`.
 - Prefer small, typed components and typed props.
 - Put shared app constants in `src/app.constants.ts` and shared app types in `src/app.types.ts`.
+- Swipe UI lives in `src/components/Swipe*` and uses pointer-based drag interactions for the active card.
+- Home page uses dynamic hero copy per platform and a single Roadmap card; avoid reintroducing the removed Focus/Workflow cards.
 
 ## Testing Guidelines
 No test framework is configured yet. If you add one, document:
@@ -60,3 +62,4 @@ Pull requests should include:
 ## Configuration & Secrets
 Do not commit credentials or environment files. Use `.env.example` to document required variables and keep secrets in your local environment or secret manager.
 The YouTube subscription flow uses `YOUTUBE_ACCESS_TOKEN` from the environment; `YOUTUBE_API_KEY` is optional.
+Channel visuals are hydrated via the `channels` API (`brandingSettings.image.bannerExternalUrl` + `snippet.thumbnails`) with batching and retry/backoff for 429s.

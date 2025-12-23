@@ -102,6 +102,24 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+.status-pill-button {
+  appearance: none;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.status-pill-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.status-pill-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
 .hero h1 {
   margin: 1.2rem 0 0.6rem;
   font-size: clamp(2.2rem, 4vw, 3.6rem);
@@ -238,6 +256,18 @@ body {
   font-size: 1.4rem;
 }
 
+.hero-roadmap {
+  background: linear-gradient(120deg, #121212 0%, var(--accent) 55%, #090909 100%);
+}
+
+.roadmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .card p {
   margin: 0 0 1rem;
   color: var(--muted);
@@ -290,6 +320,10 @@ body {
   font-size: 0.85rem;
   background: #fff;
   font-weight: 600;
+}
+
+.hero .chip {
+  color: #111;
 }
 
 .reveal {
