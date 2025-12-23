@@ -29,11 +29,30 @@ export type YoutubeApiResponse<TItem> = {
   };
 };
 
+export type YoutubeThumbnail = {
+  url: string;
+  width?: number;
+  height?: number;
+};
+
+export type YoutubeThumbnailSet = {
+  default?: YoutubeThumbnail;
+  medium?: YoutubeThumbnail;
+  high?: YoutubeThumbnail;
+};
+
 export type YoutubeSubscription = {
   id: string;
   snippet?: {
     title?: string;
     channelId?: string;
+    description?: string;
+    publishedAt?: string;
+    resourceId?: {
+      kind?: string;
+      channelId?: string;
+    };
+    thumbnails?: YoutubeThumbnailSet;
   };
 };
 
@@ -43,6 +62,19 @@ export type YoutubeChannel = {
     title?: string;
     description?: string;
     customUrl?: string;
+    thumbnails?: YoutubeThumbnailSet;
+  };
+  brandingSettings?: {
+    image?: {
+      bannerExternalUrl?: string;
+    };
+  };
+};
+
+export type YoutubeSubscriptionCard = YoutubeSubscription & {
+  visuals?: {
+    coverUrl?: string;
+    avatarUrl?: string;
   };
 };
 

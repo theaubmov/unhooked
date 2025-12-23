@@ -17,15 +17,17 @@ export function SwipeActions({
         disabled={isActionLoading}
         onClick={onUnsubscribe}
       >
-        Unsubscribe
+        <span className="action-title">&lt; Unsubscribe</span>
+        <span className="action-meta">Swipe left</span>
       </button>
       <button
         type="button"
-        className="swipe-button"
+        className="swipe-button primary"
         disabled={isActionLoading}
         onClick={onKeep}
       >
-        Keep
+        <span className="action-title">Keep &gt;</span>
+        <span className="action-meta">Swipe right</span>
       </button>
     </div>
   );

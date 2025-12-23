@@ -60,11 +60,12 @@ export class YoutubeHttpAPI implements YoutubeAPI {
     path: string,
     config: YoutubeApiConfig,
     options: RequestInit & { params?: RequestParams } = {},
+    attempt = 0,
   ): Promise<TResponse> {
     const url = new URL(`${this.baseUrl}${path}`);
     const queryParams = buildQueryParams({
       key: config.apiKey || undefined,
-      client_id: config.clientId || undefined,
+      // client_id: config.clientId || undefined,
       ...options.params,
     });
     url.search = queryParams.toString();
@@ -78,6 +79,17 @@ export class YoutubeHttpAPI implements YoutubeAPI {
       ...options,
       headers,
     });
+
+    if (response.status === 429 && attempt < 2 && (options.method ?? 'GET') === 'GET') {
+      const retryAfterHeader = response.headers.get('Retry-After');
+      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : NaN;
+      const backoffMs = Number.isFinite(retryAfterSeconds)
+        ? retryAfterSeconds * 1000
+        : 500 * (attempt + 1);
+
+      await new Promise((resolve) => setTimeout(resolve, backoffMs));
+      return this.request(path, config, options, attempt + 1);
+    }
 
     if (!response.ok) {
       const body = await response.json().catch(() => null);

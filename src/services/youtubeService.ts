@@ -13,7 +13,7 @@ export class YoutubeServiceImpl implements YoutubeService {
   private readonly defaultSubscriptionsParams: YoutubeSubscriptionsParams = {
     part: 'snippet',
     mine: true,
-    maxResults: 10,
+    maxResults: 50,
   };
 
   constructor(

@@ -5,12 +5,16 @@ import { SetupView } from './components/SetupView';
 import { SwipeView } from './components/SwipeView';
 import { YoutubeServiceImpl } from './services/youtubeService';
 import type { CSSVars, PlatformId } from './app.types';
-import type { YoutubeSubscription } from './types/youtube';
+import type {
+  YoutubeChannel,
+  YoutubeSubscription,
+  YoutubeSubscriptionCard,
+} from './types/youtube';
 
 export default function App() {
   const [activeId, setActiveId] = useState<PlatformId>('youtube');
   const [view, setView] = useState<'setup' | 'swipe'>('setup');
-  const [subscriptions, setSubscriptions] = useState<YoutubeSubscription[]>([]);
+  const [subscriptions, setSubscriptions] = useState<YoutubeSubscriptionCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +47,68 @@ export default function App() {
       accessToken: youtubeAccessToken?.trim(),
     });
 
+  const buildChannelVisuals = async (items: YoutubeSubscription[]) => {
+    const channelIds = items
+      .map((item) => item.snippet?.resourceId?.channelId || '')
+      .filter(Boolean);
+
+    const uniqueChannelIds = Array.from(new Set(channelIds));
+    if (!uniqueChannelIds.length) {
+      return new Map<string, YoutubeChannel>();
+    }
+
+    const channels: YoutubeChannel[] = [];
+    const delayBetweenBatchesMs = 150;
+
+    for (let index = 0; index < uniqueChannelIds.length; index += 50) {
+      const batchIds = uniqueChannelIds.slice(index, index + 50);
+      try {
+        const response = await createYoutubeService().getChannelDetails({
+          part: 'brandingSettings,snippet',
+          id: batchIds.join(','),
+          maxResults: batchIds.length,
+        });
+
+        channels.push(...response.items);
+      } catch {
+        // Keep going so one failed batch does not block the rest.
+      }
+
+      if (index + 50 < uniqueChannelIds.length) {
+        await new Promise((resolve) => setTimeout(resolve, delayBetweenBatchesMs));
+      }
+    }
+
+    return new Map(channels.map((channel) => [channel.id, channel]));
+  };
+
+  const applyChannelVisuals = (
+    items: YoutubeSubscription[],
+    channelsById: Map<string, YoutubeChannel>,
+  ): YoutubeSubscriptionCard[] =>
+    items.map((item) => {
+      const channelId = item.snippet?.resourceId?.channelId;
+      const channel = channelId ? channelsById.get(channelId) : undefined;
+      const avatarUrl =
+        channel?.snippet?.thumbnails?.high?.url ||
+        channel?.snippet?.thumbnails?.medium?.url ||
+        channel?.snippet?.thumbnails?.default?.url;
+      const coverUrl =
+        channel?.brandingSettings?.image?.bannerExternalUrl || avatarUrl;
+
+      if (!coverUrl && !avatarUrl) {
+        return item;
+      }
+
+      return {
+        ...item,
+        visuals: {
+          coverUrl,
+          avatarUrl,
+        },
+      };
+    });
+
   const loadSubscriptions = async (pageToken?: string) => {
     if (!youtubeAccessToken?.trim()) {
       setErrorMessage('Missing YOUTUBE_ACCESS_TOKEN in the environment.');
@@ -56,9 +122,11 @@ export default function App() {
       const response = await createYoutubeService().listUserChannels({
         pageToken,
       });
+      const channelsById = await buildChannelVisuals(response.items);
+      const hydratedItems = applyChannelVisuals(response.items, channelsById);
 
       setSubscriptions((prev) =>
-        pageToken ? [...prev, ...response.items] : response.items,
+        pageToken ? [...prev, ...hydratedItems] : hydratedItems,
       );
       setNextPageToken(response.nextPageToken);
       if (!pageToken) {
@@ -142,6 +210,8 @@ export default function App() {
           onLoadMore={() => void loadSubscriptions(nextPageToken)}
           onUnsubscribe={() => void handleSwipe('left')}
           onKeep={() => void handleSwipe('right')}
+          onSwipeLeft={() => void handleSwipe('left')}
+          onSwipeRight={() => void handleSwipe('right')}
         />
       )}
     </div>

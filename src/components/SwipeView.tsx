@@ -1,4 +1,4 @@
-import type { YoutubeSubscription } from '../types/youtube';
+import type { YoutubeSubscriptionCard } from '../types/youtube';
 import { SwipeActions } from './SwipeActions';
 import { SwipeCardStack } from './SwipeCardStack';
 import { SwipeEmptyState } from './SwipeEmptyState';
@@ -7,8 +7,8 @@ import { SwipeHeader } from './SwipeHeader';
 type SwipeViewProps = {
   currentIndex: number;
   totalCount: number;
-  currentCard?: YoutubeSubscription;
-  nextCard?: YoutubeSubscription;
+  currentCard?: YoutubeSubscriptionCard;
+  nextCard?: YoutubeSubscriptionCard;
   isLoading: boolean;
   isActionLoading: boolean;
   errorMessage: string | null;
@@ -17,6 +17,8 @@ type SwipeViewProps = {
   onLoadMore: () => void;
   onUnsubscribe: () => void;
   onKeep: () => void;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
 };
 
 export function SwipeView({
@@ -32,6 +34,8 @@ export function SwipeView({
   onLoadMore,
   onUnsubscribe,
   onKeep,
+  onSwipeLeft,
+  onSwipeRight,
 }: SwipeViewProps) {
   return (
     <section className="swipe">
@@ -46,7 +50,13 @@ export function SwipeView({
 
       {!isLoading && currentCard ? (
         <>
-          <SwipeCardStack currentCard={currentCard} nextCard={nextCard} />
+          <SwipeCardStack
+            currentCard={currentCard}
+            nextCard={nextCard}
+            isActionLoading={isActionLoading}
+            onSwipeLeft={onSwipeLeft}
+            onSwipeRight={onSwipeRight}
+          />
           <SwipeActions
             isActionLoading={isActionLoading}
             onUnsubscribe={onUnsubscribe}
